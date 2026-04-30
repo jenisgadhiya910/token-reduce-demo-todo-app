@@ -61,4 +61,36 @@ describe("TodoList", () => {
     render(<TodoList todos={todos} onToggle={noOp} onEdit={noOp} onDelete={noOp} />);
     expect(screen.queryByText(/nothing here yet/i)).not.toBeInTheDocument();
   });
+
+  it("renders a drag handle for each todo", () => {
+    const todos = [
+      makeTodo({ id: "a", title: "Alpha" }),
+      makeTodo({ id: "b", title: "Beta" }),
+    ];
+    render(<TodoList todos={todos} onToggle={noOp} onEdit={noOp} onDelete={noOp} />);
+    expect(
+      screen.getByRole("button", { name: /reorder "Alpha"/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /reorder "Beta"/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("passes onReorder through without invoking it for incidental clicks", async () => {
+    const onReorder = jest.fn();
+    const todos = [
+      makeTodo({ id: "a", title: "Alpha" }),
+      makeTodo({ id: "b", title: "Beta" }),
+    ];
+    render(
+      <TodoList
+        todos={todos}
+        onToggle={noOp}
+        onEdit={noOp}
+        onDelete={noOp}
+        onReorder={onReorder}
+      />,
+    );
+    expect(onReorder).not.toHaveBeenCalled();
+  });
 });
