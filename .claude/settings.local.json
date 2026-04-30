@@ -9,5 +9,8 @@
         "repo": "anthropics/claude-code"
       }
     }
+  },
+  "permissions": {
+    "allow": ["Bash(npm run *)"]
   }
 }

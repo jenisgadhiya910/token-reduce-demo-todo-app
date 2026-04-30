@@ -3,6 +3,7 @@
     "caveman@caveman": true
   },
   "permissions": {
+    "allow": ["Bash(npm run *)"],
     "deny": [
       "Read(./node_modules/**)",
       "Read(./.next/**)",
