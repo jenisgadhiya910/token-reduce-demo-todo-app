@@ -1,1 +1,0 @@
-- [Todo App Testing Patterns](project_testing_patterns.md) — React 19 effect timing, SSR guard mocking, storage mock pattern, crypto.randomUUID typing
