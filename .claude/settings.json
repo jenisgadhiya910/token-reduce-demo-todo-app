@@ -16,5 +16,8 @@
       "Read(**/pnpm-lock.yaml)",
       "Read(**/yarn.lock)"
     ]
+  },
+  "enabledPlugins": {
+    "caveman@caveman": true
   }
 }

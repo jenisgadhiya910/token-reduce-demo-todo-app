@@ -52,7 +52,7 @@ export function TodoApp() {
       <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
         <header className="flex items-baseline justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
           <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Todos
+            Todos List
           </h1>
           <span
             aria-live="polite"
