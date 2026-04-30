@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTodos } from "@/hooks/useTodos";
 import type { Filter } from "@/lib/types";
 import { TodoFilter } from "./TodoFilter";
@@ -8,9 +8,27 @@ import { TodoInput } from "./TodoInput";
 import { TodoList } from "./TodoList";
 
 export function TodoApp() {
-  const { todos, hydrated, add, toggle, edit, remove, clearCompleted } =
-    useTodos();
+  const {
+    todos,
+    hydrated,
+    add,
+    toggle,
+    edit,
+    remove,
+    clearCompleted,
+    reorder,
+  } = useTodos();
   const [filter, setFilter] = useState<Filter>("all");
+
+  const handleReorder = useCallback(
+    (activeId: string, overId: string) => {
+      const from = todos.findIndex((t) => t.id === activeId);
+      const to = todos.findIndex((t) => t.id === overId);
+      if (from < 0 || to < 0) return;
+      reorder(from, to);
+    },
+    [todos, reorder],
+  );
 
   const visibleTodos = useMemo(() => {
     switch (filter) {
@@ -57,6 +75,7 @@ export function TodoApp() {
               onToggle={toggle}
               onEdit={edit}
               onDelete={remove}
+              onReorder={handleReorder}
             />
           ) : (
             <div className="py-8" aria-hidden />

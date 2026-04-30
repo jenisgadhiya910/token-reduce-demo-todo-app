@@ -305,6 +305,90 @@ describe("useTodos — CLEAR_COMPLETED action", () => {
   });
 });
 
+describe("useTodos — REORDER action", () => {
+  it("moves an item from index A to index B", async () => {
+    const stored: Todo[] = [
+      makeTodo({ id: "r1", title: "A" }),
+      makeTodo({ id: "r2", title: "B" }),
+      makeTodo({ id: "r3", title: "C" }),
+    ];
+    mockRead.mockReturnValue(stored);
+
+    const { result } = renderHook(() => useTodos());
+    await act(async () => {});
+
+    act(() => result.current.reorder(0, 2));
+
+    expect(result.current.todos.map((t) => t.id)).toEqual(["r2", "r3", "r1"]);
+  });
+
+  it("moves backward as well as forward", async () => {
+    const stored: Todo[] = [
+      makeTodo({ id: "r1", title: "A" }),
+      makeTodo({ id: "r2", title: "B" }),
+      makeTodo({ id: "r3", title: "C" }),
+    ];
+    mockRead.mockReturnValue(stored);
+
+    const { result } = renderHook(() => useTodos());
+    await act(async () => {});
+
+    act(() => result.current.reorder(2, 0));
+
+    expect(result.current.todos.map((t) => t.id)).toEqual(["r3", "r1", "r2"]);
+  });
+
+  it("no-ops when from === to", async () => {
+    const stored: Todo[] = [
+      makeTodo({ id: "r1" }),
+      makeTodo({ id: "r2" }),
+    ];
+    mockRead.mockReturnValue(stored);
+
+    const { result } = renderHook(() => useTodos());
+    await act(async () => {});
+    const before = result.current.todos;
+
+    act(() => result.current.reorder(1, 1));
+
+    expect(result.current.todos).toBe(before);
+  });
+
+  it("ignores out-of-range indices", async () => {
+    const stored: Todo[] = [
+      makeTodo({ id: "r1" }),
+      makeTodo({ id: "r2" }),
+    ];
+    mockRead.mockReturnValue(stored);
+
+    const { result } = renderHook(() => useTodos());
+    await act(async () => {});
+    const before = result.current.todos;
+
+    act(() => result.current.reorder(-1, 0));
+    act(() => result.current.reorder(0, 99));
+    act(() => result.current.reorder(5, 6));
+
+    expect(result.current.todos).toBe(before);
+  });
+
+  it("persists the new order to storage", async () => {
+    const stored: Todo[] = [
+      makeTodo({ id: "r1", title: "A" }),
+      makeTodo({ id: "r2", title: "B" }),
+    ];
+    mockRead.mockReturnValue(stored);
+
+    const { result } = renderHook(() => useTodos());
+    await act(async () => {});
+
+    act(() => result.current.reorder(0, 1));
+
+    const lastWritten = mockWrite.mock.calls[mockWrite.mock.calls.length - 1][0];
+    expect(lastWritten.map((t) => t.id)).toEqual(["r2", "r1"]);
+  });
+});
+
 describe("useTodos — localStorage persistence", () => {
   it("calls storage.write after a state change post-hydration", async () => {
     mockRead.mockReturnValue([]);

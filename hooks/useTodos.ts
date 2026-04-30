@@ -10,6 +10,7 @@ type Action =
   | { type: "EDIT"; id: string; title: string }
   | { type: "DELETE"; id: string }
   | { type: "CLEAR_COMPLETED" }
+  | { type: "REORDER"; from: number; to: number }
   | { type: "HYDRATE"; payload: Todo[] };
 
 type State = {
@@ -63,6 +64,17 @@ function reducer(state: State, action: Action): State {
       };
     case "CLEAR_COMPLETED":
       return { ...state, todos: state.todos.filter((t) => !t.completed) };
+    // REORDER works on absolute indices in the underlying todos array; callers map filtered positions back to absolute before dispatch so hidden items stay put.
+    case "REORDER": {
+      const { from, to } = action;
+      const len = state.todos.length;
+      if (from === to) return state;
+      if (from < 0 || from >= len || to < 0 || to >= len) return state;
+      const next = state.todos.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return { ...state, todos: next };
+    }
   }
 }
 
@@ -91,5 +103,7 @@ export function useTodos() {
     edit: (id: string, title: string) => dispatch({ type: "EDIT", id, title }),
     remove: (id: string) => dispatch({ type: "DELETE", id }),
     clearCompleted: () => dispatch({ type: "CLEAR_COMPLETED" }),
+    reorder: (from: number, to: number) =>
+      dispatch({ type: "REORDER", from, to }),
   };
 }

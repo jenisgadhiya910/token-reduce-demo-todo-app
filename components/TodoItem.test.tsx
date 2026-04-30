@@ -45,6 +45,14 @@ describe("TodoItem — rendering", () => {
     expect(screen.getByText("Buy bread")).toBeInTheDocument();
   });
 
+  it("renders a keyboard-reachable drag handle with an aria-label", () => {
+    setup(makeTodo({ title: "Reorder me" }));
+    const handle = screen.getByRole("button", { name: /reorder "Reorder me"/i });
+    expect(handle).toBeInTheDocument();
+    expect(handle.tagName).toBe("BUTTON");
+    expect(handle).not.toBeDisabled();
+  });
+
   it("renders the checkbox as unchecked for an incomplete todo", () => {
     setup(makeTodo({ completed: false }));
     expect(screen.getByRole("checkbox")).not.toBeChecked();
