@@ -1,17 +1,29 @@
 # CLAUDE.md
 
-Guidance for Claude when working in this codebase. Read this before making any changes.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+Read this before making any changes.
 
 ## Project Summary
 A simple todo app — **Next.js 16 (App Router) + TypeScript + Tailwind CSS** with **localStorage** for persistence. Fully client-side. No API routes, no backend. See `PROJECT_OVERVIEW.md` for the full feature list and structure.
 
 ## Commands
 ```bash
-npm run dev      # start dev server on http://localhost:3000
-npm run build    # production build
-npm start        # run production build
-npm run lint     # ESLint
+npm run dev            # start dev server on http://localhost:3000
+npm run build          # production build
+npm start              # run production build
+npm run lint           # ESLint
+
+npm test               # run Jest test suite
+npm run test:watch     # Jest in watch mode
+npm run test:coverage  # Jest with coverage report
+
+# run a single test file or pattern
+npm test -- hooks/useTodos.test.ts
+npm test -- -t "toggles a todo"
 ```
+
+Path alias: `@/*` resolves to the repo root (configured in `tsconfig.json` and mirrored in `jest.config.ts`). Prefer `@/lib/storage` over relative paths that climb out of the current dir.
 
 ## Architecture Rules
 
@@ -79,6 +91,14 @@ Use `crypto.randomUUID()`. No need for `uuid` or `nanoid` packages.
 - Checkbox is a real `<input type="checkbox">` with a label association.
 - Delete button has a clear `aria-label`.
 
+## Testing
+- **Stack**: Jest 30 + `@testing-library/react` + `@testing-library/user-event` + `jest-dom` matchers (auto-loaded via `jest.setup.ts`).
+- **Environment**: `jsdom` (configured in `jest.config.ts` via `next/jest`).
+- **Co-locate**: tests live next to source as `*.test.ts(x)` (e.g., `components/TodoItem.test.tsx`, `hooks/useTodos.test.ts`, `lib/storage.test.ts`).
+- For hook tests use `renderHook` + `act` from `@testing-library/react`.
+- For storage tests, reset `localStorage` between tests; jsdom provides a working implementation.
+- Prefer user-event over fireEvent — it more closely simulates real keyboard / click flows the a11y rules above depend on.
+
 ## What NOT to Do
 - ❌ Don't create `app/api/...` routes — this is fully client-side.
 - ❌ Don't add Redux, Zustand, Jotai, or any state library — `useReducer` is enough.
@@ -101,6 +121,7 @@ Use `crypto.randomUUID()`. No need for `uuid` or `nanoid` packages.
 - All features in `PROJECT_OVERVIEW.md` work.
 - `npm run build` succeeds with zero errors and zero warnings.
 - `npm run lint` is clean.
+- `npm test` passes.
 - No hydration mismatches in browser console.
 - Keyboard accessible end-to-end.
 - Works on mobile (responsive) and desktop.
